@@ -1,0 +1,310 @@
+<div class="game-header">
+    <div class='row'>
+
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+
+            <form ng-submit="addAddress()" style="margin:20px 0px;height:100px;" class="form-horizontal" role='form'>
+                
+                  <input type="text" style="font-size:20px;height:46px;margin-bottom:10px;" placeholder="Enter Your Bitcoin Wallet Address" ng-model="newAddress" required class="form-control input-normal"  />
+                  <input style="width:100%;" type="submit" value="Add This Address to My Games" class="btn btn-primary pull-left btn-lg"  />                      
+            </form>
+
+            <h3 ng-show="addresses.length">Addresses displayed:</h3>
+            <h4 ng-hide="addresses.length">Displaying all bets. Add your wallet address to watch your bets!</h4>
+            <div class="row">
+                <div ng-repeat="address in addresses track by $index" class="col-xs-4" style="border-radius:5px;background-color:#220000;padding:2px;">
+                    <button class="btn btn-primary btn-large" style="font-size:20px;" ng-click="removeAddress(address)">X<!-- remove--></button>&nbsp;<div style="font-size:11px;" blockchain-info="{{ address }}" chars="8"></div>
+                </div>
+            </div>
+
+            <div ng-show="myGamesLoading">Loading</div>
+            <table class="table table-bordered dicesTable" ng-hide="myGamesLoading">
+                <thead>
+                    <tr>
+                        <th>Proof</th>
+                        <th>Game</th>
+                        <th>Address</th>
+                        <th>Bet Amount</th>
+                        <th>Payout</th>
+                        <th>Lucky</th>
+                        <th>Add</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="dice in myGames track by $index">
+                        <td style="text-align:center">
+                            <a data-toggle="modal" style="cursor: pointer;" class="glyphicon glyphicon-info-sign" data-target="#transactions{{dice._id.replace(':', '')}}"></a>
+                            <div style="text-align: left" ng-include="'tpl/detail-modal.html'"
+                                 id="transactions{{dice._id.replace(':', '')}}"
+                                 class="modal fade">
+                            </div>
+                        </td>
+                        <td>&lt; {{ dice.game }} 
+                        </td>
+                        <td>
+                            <div blockchain-info="{{ dice.player_id }}" chars="6"></div>
+                        </td>
+                        <td>{{ dice.wager | btc }}</td>
+                        <td>{{ dice.winnings | btc }}</td>
+                        <td>{{ dice.result }}</td>
+                        <td>
+                            <img style="cursor: pointer;" width="33" height="33" ng-show="addresses.length === 0" ng-src="{{starGraphic(dice.player_id)}}" ng-click="toggleStar(dice.player_id)" bootstrap-tooltip="Add this address to my games">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Look up a game by transaction hash</h3>
+            <form ng-submit="diceLookup()" class="form-inline">
+                <div class="form-group">
+                    <input id="dice-query" ng-model="diceQuery" type="text"  class="form-control" placeholder="TX Hash">
+                </div>
+                <button type="submit" class="btn btn-default">Search</button>
+            </form>
+            <div class="panel" ng-show="diceSearchLoading"><p>Searching...</p></div>
+            <div class="panel" ng-show="diceSearchError">
+                <p>Nothing found. Is {{ diceQuery }} a valid Bitcoin transaction hash?</p>
+            </div>
+            <div class="panel" ng-show="diceSearchResult">
+                <dl class="dl-horizontal">
+                    <dt>Processed at: </dt><dd>{{ diceSearchResult.createdAt | date:"MM/dd/yy HH:mm:ss" }}</dd>
+                    <dt>Key Date: </dt><dd>{{ diceSearchResult.createdAt | date:"MM/dd/yy" }}</dd>
+                    <dt>Bet: </dt><dd>&lt; {{ diceSearchResult.game }}</dd>
+                    <dt>Bet Tx: </dt><dd><div blockchain-info="{{ diceSearchResult.tx_in }}" chars="12"></div></dd>
+                    <dt>Payment Tx: </dt><dd><div blockchain-info="{{ diceSearchResult.tx_out }}" chars="12"></div></dd>
+                    <dt>Payment Tx Status: </dt><dd>{{ diceSearchResult.confirmed && "Confirmed" || "Unconfirmed" }}</dd>
+                    <dt>Bet Amount: </dt><dd>{{ diceSearchResult.wager | btc }}</dd>
+                    <dt>Outcome: </dt><dd>{{ diceSearchResult.winnings > diceSearchResult.wager && "WIN" || "LOSE" }}</dd>
+                    <dt>Payment: </dt><dd>{{ diceSearchResult.winnings | btc }}</dd>
+                    <dt>Address: </dt><dd><div blockchain-info="{{ diceSearchResult.player_id }}" chars="12"></div></dd>
+                    <dt>Lucky Number: </dt><dd>{{ diceSearchResult.result }}</dd>
+                    <dt>Secret Key:</dt>
+                    <dd>
+                        <span ng-hide="loadingSecret || secrets[diceSearchResult._id]"
+                              ng-click="loadSecret(diceSearchResult)"
+                              style="cursor: pointer;">
+                            CLICK TO GET SECRET HASH
+                        </span>
+                        <span ng-show="loadingSecret">Loading...</span>
+                        <span style="word-wrap: break-word;" ng-show="secrets[diceSearchResult._id]">{{ secrets[diceSearchResult._id] }}</span>
+                    </dd>
+                </dl>
+            </div>
+
+
+        </div>
+
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 pull-right">
+            <h3>Bet Addresses</h3>
+            <h4>Minimum Bet: 0.01 BTC</h4>
+
+
+          <div ng-repeat="game in games track by $index" class="gamelist panel col-xs-6 col-lg-4">
+
+
+                
+            <div style="font-size:24px;">&lt;{{ game.target }}</div>
+            <button class="btn btn-primary btn-lg" ng-click="sendBitcoins(game.address)">Bet</button>                   
+            
+            <!--<div style="font-family: monospace;font-size:9px;" >{{ game.address }}</div>   -->
+
+            <div><b>Win Odds</b>: {{ game.odds * 100 | number:4 }}%</div>
+            <div><b>Prize Multiplier<b>: {{ game.multiplier | number:4 }}x</div>
+            <div><b>Max Bet</b>: {{ game.maxBet | btcB }}</div>
+
+                
+            <div id="modal{{game.address}}" class="qc-modal modal fade">
+                <div class="modal-dialog qr-modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">×</button>
+                            <h3>{{ game.title }}</h3>
+                            <div><small>{{ game.address }}</small></div>
+                        </div>
+                        <div class="modal-body">
+                            <img ng-src="img/qr-codes/{{ game.address }}.png" />
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-6 pull-left">
+            <h2>How to Play</h2>
+            <ol>
+            <li><h4>Send at least 0.01 Bitcoins to a <b>Game Address</b> by clicking "Bet" button</h4></li>
+            <li><h4>Our system will process your bet as soon as it is received, and your winnings will be sent <b>immediately</b></h4></li>
+            <li><h4>Enter your wallet addresses or "star" your bets to view yours or anyone else's bets in real-time on the "My Games" tab!</h4></li>
+            <li><h4>If you don't have a Bitcoin wallet, visit <a href="https://www.betcoin.tm/what-is-bitcoin">"What is Bitcoin?"</a></h4></li>  
+            </ol>
+            <hr>
+            <h1>0.01 Minimum Bet</h1>
+            <h2>Warning</h2>
+            <h3>
+                Only use wallets that allow you to receive Bitcoin from the same address you sent from. If you're not sure, test by sending a bet for the minimum amount. If you get nothing back, then your wallet is not compatible. Note that some bets may require one confirmation before the win/loss value is sent back.
+            </h3>
+            <br>
+            
+            <h4>How it works</h4>   
+            <ul>
+                <li>{{'_ColumnRightli1_' | i18n}}</li>
+                <li>{{'_ColumnRightli2_' | i18n}}</li>
+                <li>{{'_ColumnRightli3_' | i18n}}</li>
+                <li>{{'_ColumnRightli4_' | i18n}}</li>
+            </ul>   
+            <p>
+                Your bet is evaluated when our system receives your bet transaction. Your payout transaction is built using the output of your bet transaction. Therefore, if your bet transaction fails, the payout transaction also fails.
+            <br>
+            Play by sending BTC to a game address in the Games tab.  There is a consolation prize of your bet * 0.005. If you win, your winnings equals your bet * the prize multiplier for your game.
+            <br>
+            Every bet receives an answering transaction which spends the output of your bet transaction. The transaction fee for is subtracted from your winnings or the consolation prize.</p>
+
+            <h4>Transaction Processing Time</h4>
+
+            <p>A transaction fee of .0005 is recommended. Sometimes there is a delay in processing bets. Every bet uses the date that our system is first made aware of the bet, so that your lucky number doesn't change if our system cannot process your bet.</p>
+
+            <h4>Problems</h4>
+
+            <p>
+            <a class="header-link" href="https://betcoin.tm/support">
+            contact support</a></p>
+
+            <h4>Min / Max Bets</h4>
+
+            <p>Any bets less than the minimum bet (.01 BTC) or higher than the maximum bet (which is determined separately for each game) is considered an invalid bet, and will be returned, minus the transaction fee.</p>
+
+            <h4>Minimum Payments</h4>
+
+            <p>If the payment amount is less than 5460 satoshi, the payment is set to 0.00005460.</p>
+
+            <h2>Advanced</h2>
+            <hr>
+            <br>
+            <h3>Advanced Tips</h3>
+            <h4>Multiple bets per transaction</h4>
+            <p>To place multiple bets in one transaction, you can use your wallet to send to several different bet addresses at once. Each individual bet will have a different lucky number.</p>
+            <br>
+            <h4>Custom withdrawal addresses</h4>
+            <p>Normally, when you send a bet, the return payment is sent back to the same Bitcoin address you sent from. However, there is a way to have the return payment sent to a new, custom address.
+            </p>    
+            <ul>
+                <li>
+                    If you add an additional payment to your bet transaction, sending exactly 0.0051999 BTC to a separate address, the payout for the bet will go to that address.
+                </li>
+                <li>
+                    In Bitcoin-QT, this is done by clicking the 'Add recipient...' button.
+                </li>
+                <li>
+                    The first payment in the transaction must go to BetCoin Dice with your bet amount, and the second payment in the transaction must go to [yournewaddress] with the amount of 0.0051999. If you win, all the money will then be sent to [yournewaddress].
+                </li>
+            </ul>
+                
+                            
+            <h2>FAQ</h2>
+            <hr>
+            <h4>What are the Betcoin ™ Dice Player Leagues?</h4>
+            <br>
+            <p>In order to provide players with a fair and logically sound rewards system, BetCoin ™ Dice has established the following system of Player Leagues, Reward Points, and Awards:
+            </p><br><p>There are five different leagues, which progressively indicate a higher player status, as well as provide access to higher awards and prizes:
+            </p>
+            <br>
+            <ol>
+                <li>
+                    Bronze League: This league is for players, who have wagered any amount of bitcoin below 1 BTC. 
+                </li>
+                <li>
+                    Silver League: This league is for players, who have wagered a total of 1 BTC after entering the Bronze League.If a Silver League player hasn't wagered a total of at least at least 0.01 BTC within 90 days, he's demoted to the Bronze League. 
+                </li>
+                <li>
+                    Gold League: This league is for players, who have wagered a total of 10 BTC after entering the Silver League. If a Gold League player hasn't wagered a total of at least at least 0.1 BTC within 90 days, he's demoted to the Silver League. 
+                </li>
+                <li>
+                    Platinum League: This league is for players, who have wagered a total of 100 BTC after entering the Gold League. If a  Platinum League player hasn't wagered a total of at least at least 1 BTC within 90 days, he's demoted to the Gold League. 
+                </li>
+                <li>
+                    Diamond league: This league is for players, who have wagered a total of 1000 BTC after entering the Platinum League. This is the top league in BetCoin ™ Dice. If a Diamond League player hasn't wagered a total of at least at least 10 BTC within 90 days, he's demoted to the Platinum League. 
+                </li>
+            </ol>
+
+            <br>
+
+            <h2>Custom Bets</h2>
+            <hr>
+            <p>Players can bet as little as 0.01 BTC, or as much as 888 BTC on a single bet, with the prize multiplier exceeding 64,000. There are 27 different games with different win odds – starting from 97.6563%, all the way to 0.001%, to suite any type of risk appetite. If this is not enough for a particularly demanding player - special arrangements can be made by contacting our support team, and we will manually increase the maximum bet size tenfold</p>
+            <br>
+
+            <h2>Verification</h2>
+            <hr>
+            <br>
+            <h4>Secret Keys</h4>
+            <p>
+                In order to ensure that there is no way for the system to change the outcome of a bet, the secret keys used are decided ahead of time. They are not released right away, since they could be used to submit selective transactions and win bets unfairly. However, the hash of the secrets is released. After the secrets are release users can verify that preceding bets were provably fair.
+            </p>
+            <br>
+            <h4>Days</h4>
+            <p> 
+                Each bet transaction that comes in is assigned to the secret key of the current day when it is first processed. In most cases this will be as soon as the transaction is broadcast on the bitcoin network. However it could be later if the system has some problems processing or an outage. All times are in GMT
+            </p>
+            <br>
+            <h4>Hash File</h4>
+            <p> 
+                The system has a file of all the hash keys for the next 10 years: <a href="https://api.betcoin.tm/hashes.keys">hashes.keys</a>
+                This file can be verified in several ways. The simplest is to simply download and keep a copy of that file.
+            </p>
+            <br>
+
+            <h4>Secrets</h4>
+            <p> 
+                Every 24 hours the system will allow access to the previous day's secret. Then the code below can be used to verify each game was provably fair. A list of secrets for previous days can be found here:
+                <a href="https://api.betcoin.tm/secret.keys">secret.keys</a>
+            </p>
+            <pre class="data">
+var verifyGame = function(gameData, secret) {
+    var vout = gameData.output_number;
+    var txid = gameData.tx_in;
+    var hash = gameData.secret_hash;
+
+    var sha = crypto.createHash('sha256');
+    sha.update(secret);
+
+    var hashedSecret = sha.digest('hex');
+
+    if (hashedSecret === hash) {
+        console.log("secret key OK");
+        console.log('sha256(%s) = %s == %s <- hash provided', secret, hashedSecret, hash);
+    } else {
+        console.error("ERROR: secret key FAILED");
+        console.error('sha256(%s) = %s != %s <- hash proveded', secret, hashedSecret, hash);
+        process.exit(2);
+    }
+
+    var hmac = crypto.createHmac('sha512', secret);
+    hmac.update(txid + ":" + vout);
+    var hmacHash = hmac.digest('hex');
+    console.log('hmac512(%s, %s:%d) = %s', secret, txid, vout, hmacHash);
+    console.log('hmac hash : %s', hmacHash);
+    console.log('saved hmac: %s', gameData.hmachash);
+
+    var rawRoll = hmacHash.substring(0, 4);
+    console.log('hash partial: %s', rawRoll);
+    console.log('roll: %d', parseInt(rawRoll, 16));
+    console.log('saved roll: %d', gameData.result);
+    if (parseInt(rawRoll, 16) !== gameData.result) {
+        console.error('game does not check out!!! _id: %s', gameData._id);
+        process.exit(3);
+    }
+}
+            </pre>
+            <br>
+            <h4>Lucky Number</h4>
+            <p> 
+                The lucky number used to determine the winner of games is the first two bytes of crypto.createHmac('sha512', secret);
+            </p>
+            <br>            
+        </div>
+
+    </div>
+</div><!-- end game-header -->

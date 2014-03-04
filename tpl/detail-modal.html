@@ -1,0 +1,53 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Transaction</h3>
+            <p style="font-size:10px;">{{ dice.tx_in }}:{{ dice.output_number }}</p>
+        </div>
+        <div class="modal-body">
+            <ul>
+                <li>Processed at: {{ dice.createdAt | date:"MM/dd/yy HH:mm:ss" }}</li>
+                <li>Key Date: {{ dice.createdAt | date:"MM/dd/yy" }}</li>
+                <li>Bet: &lt; {{ dice.game }}</li>
+                <li>Bet Tx: <div blockchain-info="{{ dice.tx_in }}"></div></li>
+                <li>Payment Tx: <div blockchain-info="{{ dice.tx_out }}"></div></li>
+                <li>Payment Tx Status: {{ dice.confirmed && "Confirmed" || "Unconfirmed" }}</li>
+                <li>Bet Amount: {{ dice.wager | btc }}</li>
+                <li>Outcome: {{ dice.winnings > dice.wager && "WIN" || "LOSE" }}</li>
+                <li>Payment: {{ dice.winnings | btc }}</li>
+                <li>Address: <div blockchain-info="{{ dice.player_id }}"></div></li>
+                <li>Lucky Number: {{ dice.result }}</li>
+            </ul>
+            <h4>Secret Hashes</h4>
+            <h5>Verify</h5>
+            <p>
+                Download and verify 
+                <a target="_blank" href="https://api.betcoin.tm/hashes.keys">
+                    hashes.keys
+                </a>
+            </p>
+            <p>
+                For more details on the secret keys see 
+                <a target="_blank" href="https://api.betcoin.tm/secret.keys">
+                    secret.keys
+                </a>
+            </p>
+            <p>
+                Game Secret Key:
+                <span ng-hide="loadingSecret || secrets[dice._id]"
+                      ng-click="loadSecret(dice)"
+                      style="cursor: pointer;">
+                    CLICK TO GET SECRET HASH
+                </span>
+                <span ng-show="loadingSecret">Loading...</span>
+                <span ng-show="secrets[dice._id]">{{ secrets[dice._id] }}</span>
+            </p>
+            <div data-ng-include data-src="'tpl/verify.html'"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-default" data-dismiss="modal">
+                Close
+            </button>
+        </div>
+    </div>
+</div>

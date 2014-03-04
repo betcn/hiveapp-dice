@@ -1,0 +1,50 @@
+<div id="verification" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h3 id="myModalLabel">Verification</h3>
+            </div>
+            <div class="modal-body">
+                <H3>Secret Keys</H3>
+                <p>
+                    In order to ensure that there is no way for the system to change the outcome of a bet, the secret keys used are decided ahead of time. They are not released right away, since they could be used to submit selective transactions and win bets unfairly. However, the hash of the secrets is released. After the secrets are release users can verify that preceding bets were provably fair.
+                </p>
+                <H3>Days</H3>
+                <p>
+                    Each bet transaction that comes in is assigned to the secret key of the current day when it is first processed. In most cases this will be as soon as the transaction is broadcast on the bitcoin network. However it could be later if the system has some problems processing or an outage. All times are in GMT.
+                </p>
+                <H3>Hash File</H3>
+                <p>
+                    Each bet transaction that comes in is assigned to the secret key of the current day when it is first processed. In most cases this will be as soon as the transaction is broadcast on the bitcoin network. However it could be later if the system has some problems processing or an outage. All times are in GMT.
+                        <a href='/dice/hashes.keys'>
+                            hashes.keys
+                        </a>
+                </p>
+                <p>
+                    This file can be verified in several ways.  The simplest is to simply download and keep a copy of that file.  
+                </p>
+                <br/>
+                <H3>Secrets</H3>
+                <p>
+                    Every 24 hours the system will allow access to the previous day's secret. Then the code below can be used to verify each game was provably fair. A list of secrets for previous days can be found here: 
+                </p>
+                <p>
+                    <a href='http://{{apiDomain}}/secret.keys'>
+                        secret.keys
+                    </a>
+                </p>
+                <div data-ng-include data-src="'tpl/verify.html'"></div>
+                <H3>Lucky Number</H3>
+                <p>
+                    The lucky number used to determine the winner of games is the first two bytes of crypto.createHmac('sha512', secret);
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,8 @@
+{
+  "name": "BetCoin Dice",
+  "id": "tm.betcoin.dice",
+  "version": "1.0",
+  "author": "BetCoin",
+  "description": "Hive BetCoin Dice Game",
+  "icon": "hiveapp-icon.png"
+}
