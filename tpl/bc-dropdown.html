@@ -1,11 +1,15 @@
 <div class="btn-group">
   <button type="button" class="btn btn-default btn-lg dropdown-toggle" style="font-size:22px;" data-toggle="dropdown">
-    Select Game<span class="caret"></span>
+      <div style="display:inline-block;width:70px;font-size:12px;">Select Game:</div>
+      <div style="display:inline-block;width:80px;">{{currentSelectedGame.title}}</div>
+      <span style="font-size:13px;">{{currentSelectedGame.odds * 100 | number:4}}</span>
+      <span style="font-size:11px;">%</span>&nbsp;<span class="caret"></span>
   </button>
   <ul class="dropdown-menu" role="menu" style="width:260px;font-size:22px;height: auto;max-height: 280px;overflow-x: hidden;">
-    <li ng-repeat="game in games"><a href="#" ng-click="select(game)" style="text-align:left;"><div style="display:inline-block;width:80px;">{{game.title}}</div><span style="font-size:13px;">Win Odds: {{game.odds * 100 | number:4}}</span><span style="font-size:11px;">%</span></a></li>
+    <li ng-repeat="game in games"><a href="#" ng-click="select(game)" style="text-align:left;"><div style="display:inline-block;width:70px;font-size:14px;">{{game.title}}</div><span style="font-size:13px;">Win Odds: {{game.odds * 100 | number:4}}</span><span style="font-size:11px;">%</span></a></li>
   </ul>
 </div>
 <div style="margin:10px 0px 0px 0px;">
-        <a class="btn btn-default btn-lg" style="font-size:22px;" ng-href="bitcoin:{{currentSelectedGame.address}}"><span style="font-size:14px;">Click to Bet </span><div style="display:inline-block;width:70px;text-align:left;">{{currentSelectedGame.title}}</div><span style="font-size:13px;">Odds: {{currentSelectedGame.odds * 100 | number:4}}</span><span style="font-size:11px;">%</span></a>
+
+            <a class="btn btn-default btn-lg" style="font-size:22px;" ng-href="bitcoin:{{currentSelectedGame.address}}"><span style="font-size:14px;">Click to Bet </span><div style="display:inline-block;width:70px;text-align:left;">{{currentSelectedGame.title}}</div><span style="font-size:13px;">Odds: {{currentSelectedGame.odds * 100 | number:4}}</span><span style="font-size:11px;">%</span></a>        
 </div>
