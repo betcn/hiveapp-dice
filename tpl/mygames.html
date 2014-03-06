@@ -23,11 +23,11 @@
                     <tr>
                         <th>Proof</th>
                         <th>Game</th>
-                        <th>Address</th>
-                        <th>Bet Amount</th>
-                        <th>Payout</th>
                         <th>Lucky</th>
                         <th ng-show="addresses.length === 0">Add</th>
+                        <th>Address</th>
+                        <th class="hidden-xs hidden-sm">Bet Amount</th>
+                        <th class="hidden-xs hidden-sm">Payout</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,16 +40,16 @@
                             </div>
                         </td>
                         <td>{{ dice.game }}
+                        <td>{{ dice.result }}</td>
+                        <td ng-show="addresses.length === 0">
+                            <img style="cursor: pointer;" width="30" height="30" ng-show="addresses.length === 0" ng-src="{{starGraphic(dice.player_id)}}" ng-click="toggleStar(dice.player_id)" bootstrap-tooltip="Add this address to my games">
+                        </td>                        
                         </td>
                         <td>
                             <div blockchain-info="{{ dice.player_id }}" chars="6"></div>
                         </td>
-                        <td>{{ dice.wager | btc }}</td>
-                        <td>{{ dice.winnings | btc }}</td>
-                        <td>{{ dice.result }}</td>
-                        <td ng-show="addresses.length === 0">
-                            <img style="cursor: pointer;" width="30" height="30" ng-show="addresses.length === 0" ng-src="{{starGraphic(dice.player_id)}}" ng-click="toggleStar(dice.player_id)" bootstrap-tooltip="Add this address to my games">
-                        </td>
+                        <td class="hidden-xs hidden-sm">{{ dice.wager | btc }}</td>
+                        <td class="hidden-xs hidden-sm">{{ dice.winnings | btc }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -97,38 +97,37 @@
 
             <h1>Bet Addresses</h1>
             <h2>0.001 BTC Minimum Bet</h2>
-          <div ng-repeat="game in games track by $index" class="gamelist panel col-xs-6 col-lg-4">
+            <div class="row">
+              <div ng-repeat="game in games track by $index" class="gamelist panel col-xs-6 col-lg-4">
+                <div style="font-size:24px;">&lt;{{ game.target }}</div>
+                <button class="btn btn-primary btn-lg" ng-click="sendBitcoins(game.address)">Bet</button>
+
+                <!--<div style="font-family: monospace;font-size:9px;" >{{ game.address }}</div>   -->
+
+                <div><b>Win Odds</b>: {{ game.odds * 100 | number:4 }}%</div>
+                <div><b>Prize Multiplier<b>: {{ game.multiplier | number:4 }}x</div>
+                <div><b>Max Bet</b>: {{ game.maxBet | btcB }}</div>
 
 
-
-            <div style="font-size:24px;">&lt;{{ game.target }}</div>
-            <button class="btn btn-primary btn-lg" ng-click="sendBitcoins(game.address)">Bet</button>
-
-            <!--<div style="font-family: monospace;font-size:9px;" >{{ game.address }}</div>   -->
-
-            <div><b>Win Odds</b>: {{ game.odds * 100 | number:4 }}%</div>
-            <div><b>Prize Multiplier<b>: {{ game.multiplier | number:4 }}x</div>
-            <div><b>Max Bet</b>: {{ game.maxBet | btcB }}</div>
-
-
-            <div id="modal{{game.address}}" class="qc-modal modal fade">
-                <div class="modal-dialog qr-modal">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">×</button>
-                            <h3>{{ game.title }}</h3>
-                            <div><small>{{ game.address }}</small></div>
-                        </div>
-                        <div class="modal-body">
-                            <img ng-src="img/qr-codes/{{ game.address }}.png" />
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-primary" data-dismiss="modal">Close</button>
+                <div id="modal{{game.address}}" class="qc-modal modal fade">
+                    <div class="modal-dialog qr-modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">×</button>
+                                <h3>{{ game.title }}</h3>
+                                <div><small>{{ game.address }}</small></div>
+                            </div>
+                            <div class="modal-body">
+                                <img ng-src="img/qr-codes/{{ game.address }}.png" />
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-primary" data-dismiss="modal">Close</button>
+                            </div>
                         </div>
                     </div>
                 </div>
+              </div>
             </div>
-          </div>
         </div>
 
         <div class="col-xs-12 col-sm-6 pull-left">
