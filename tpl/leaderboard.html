@@ -1,0 +1,26 @@
+<ul class="nav nav-pills nav-justified">
+    <li ng-class="getLeaderboardTabClass('global')"><a href="leaderboard">Top Players</a></li>
+    <li ng-class="getLeaderboardTabClass('bronze')"><a href="leaderboard/bronze">Bronze</a></li>
+    <li ng-class="getLeaderboardTabClass('silver')"><a href="leaderboard/silver">Silver</a></li>
+    <li ng-class="getLeaderboardTabClass('gold')"><a href="leaderboard/gold">Gold</a></li>
+    <li ng-class="getLeaderboardTabClass('platinum')"><a href="leaderboard/platinum">Platinum</a></li>
+    <li ng-class="getLeaderboardTabClass('diamond')"><a href="leaderboard/diamond">Diamond</a></li>
+</ul>
+<fieldset id="recent">
+    <table class="table table-bordered dicesTable">
+        <thead>
+            <tr>
+                <th>Alias</th>
+                <th>BTC Wagered</th>
+                <th>Rewards</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="player in leaderboard">
+                <td>{{ player.alias }}</td>
+                <td>{{player.games.dice.totalWagered | btc}}</td>
+                <td>{{player.games.dice.totalRewards | btc}}</td>
+            </tr>
+        </tbody>
+    </table>
+</fieldset>
